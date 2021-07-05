@@ -3,6 +3,7 @@ autowatch = 1;
 outlets = 1;
 var messageSet = {};
 var table = [];
+var messageSetKeys = [];
 
 function clear(){
 	post("clearing");
@@ -41,6 +42,7 @@ function tableToMessageSet(){
 			} 
 		}	
 	}
+	messageSetKeys = Object.keys(messageSet);
 }
 
 
@@ -79,6 +81,10 @@ function getText(text){
 }
 
 function getMessage(bar, beat, sub){
+	
+//	getMessageRegex(bar, beat, sub);
+//	return;
+	
 //	timecode = timecode.trim();
 	var timecode = bar + "."+ beat + "." +sub;
 //	post("trying to getMessage " + timecode + "\n");
@@ -101,4 +107,22 @@ function getMessage(bar, beat, sub){
 			outlet(0, messageSet[rectimecode2][i]);
 		}
 	}	
+}
+
+function getMessageRegex(bar, beat, sub){
+	var timecode = bar + "-"+ beat + "-" +sub;
+	for(var i = 0; i<messageSetKeys.length; i++){
+		key = messageSetKeys[i];
+		if(key.charAt(0)== "/"){
+			// key is a regex
+			var regex = new RegExp(key.substring(1, key.length - 1));
+			if(regex.test(timecode)){
+				for(var i = 0; i < messageSet[key].length; i++){
+					outlet(0, messageSet[key][i]);
+				}				
+			}
+		}
+	}
+	
+
 }
